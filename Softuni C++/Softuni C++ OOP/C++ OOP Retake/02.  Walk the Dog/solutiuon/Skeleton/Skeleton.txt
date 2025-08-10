@@ -1,0 +1,97 @@
+//classes.h//
+#ifndef CLASSES_H
+#define CLASSES_H
+
+#include <string>
+#include <ostream>
+
+class Dog {
+
+    public:
+
+        Dog(const std::string & name, int power) : name(name), power(power) {}
+
+        friend std::ostream & operator << (std::ostream & ostr, const Dog &);
+
+        int getPower(void) const { return power; }
+
+    private:
+        std::string name;
+        int power;
+};
+
+class Employee {
+
+    public:
+
+        Employee(char first, char second, int strength) : first(first), second(second), strength(strength) {}
+
+        friend std::ostream & operator << (std::ostream & ostr, const Employee &);
+
+        int getStrength(void) const { return strength; }
+
+    private:
+        char first, second;
+        int strength;
+
+};
+
+class Match {
+
+    const Dog dog;
+    const Employee employee;
+
+    public:
+
+        Match(const Dog & dog, const Employee & employee) : dog(dog), employee(employee) {}
+
+        friend std::ostream & operator << (std::ostream & ostr, const Match &);
+
+};
+
+#endif
+~~!!!==#==!!!~~
+//main.cpp//
+#include <iostream>
+#include <vector>
+#include <string>
+#include <cmath>
+#include <algorithm>
+#include <sstream>
+#include <climits>
+
+#include "classes.h"
+
+#include "solution.h"
+
+using namespace std;
+
+int main() {
+    vector<Dog> dogs;
+    vector<Employee> employees;
+
+    string buffer;
+    while (getline(cin, buffer) && buffer != ".") {
+        string first, second, third;
+        int value;
+        istringstream istr(buffer);
+
+        istr >> first >> second >> third;
+        if ((bool)istr == false)
+            // there's an error in the stream - 'third' was not read, it's a dog!
+            dogs.emplace_back(first, stoi(second));
+        else
+            // no error in the stream - there was a third parameter - it's an employee 
+            employees.emplace_back(first[0], second[0], stoi(third));
+    }
+
+    vector<Match> matches = match(dogs, employees);
+
+    print<vector<Match>>(cout, matches, "Matched:");
+    print<vector<Dog>>(cout, dogs, "Dogs without a walker:");
+    print<vector<Employee>>(cout, employees, "Employees without work:");
+
+    return 0;
+}
+
+~~!!!==#==!!!~~

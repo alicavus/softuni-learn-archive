@@ -1,0 +1,6 @@
+http://svn.softuni.org/admin/svn/python-advanced/Jan-2024/Python-Advanced/Regular-Exam/01-Chicken-Snack-Problem-Description.docx
+http://svn.softuni.org/admin/svn/python-advanced/Jan-2024/Python-Advanced/Regular-Exam/02-Clear-Skies-Problem-Description.docx
+http://svn.softuni.org/admin/svn/python-advanced/Jan-2024/Python-Advanced/Regular-Exam/03-Cookbook-Problem-Description.docx
+
+
+

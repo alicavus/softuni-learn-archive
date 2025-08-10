@@ -1,0 +1,393 @@
+//Figurine.h//
+#ifndef FIGURINE_H
+#define FIGURINE_H
+
+#include "Coord.h"
+
+#include <string>
+#include <vector>
+
+class Board;
+
+class Figurine {
+
+        Coord coord;
+
+    public:
+
+        Figurine(const Coord & coord) : coord(coord) {}
+        virtual ~Figurine() = default;
+
+        const Coord & getCoord() const { return coord; }
+
+        // returns vector of fields, which are endangered by the Figurine
+        virtual std::vector<Coord> endangersFields(const Board & b) const = 0;
+
+        // returns the respective tags (chars) to represent the figurine in a board
+        virtual char getNonEndangeredTag(void) const = 0;
+        virtual char getEndangeredTag(void) const = 0;
+
+        static Figurine * factory(const std::string & type, const Coord & coord);
+};
+
+
+
+#endif
+~~!!!==#==!!!~~
+//Engine.h//
+#ifndef __ENGINE_H
+#define __ENGINE_H
+
+#include "Board.h"
+#include "DangerCalculator.h"
+
+#include <vector>
+#include <memory>
+#include <sstream>
+
+class Engine {
+
+    std::vector< std::unique_ptr<Figurine>  > contents;
+    Board board;
+
+    public:
+
+        Engine(size_t size) : board(size) { }
+
+        void read(const std::string & str) {
+            std::istringstream istr(str);
+
+            std::string coord, type;
+            istr >> coord >> type;
+
+            Figurine * f = Figurine::factory(type, Coord(coord));
+            contents.emplace_back(std::unique_ptr<Figurine>(f));
+            board[coord] = f;
+        }
+
+        size_t getSize(void) const { return board.getSize(); }
+        const Board & getBoard(void) const { return board; }
+
+        void accept(FigurineCalculator & c) const {
+            for (auto & f : contents)
+                c.calculate(f.get());
+        }
+
+        std::pair<size_t, std::string> calculateDanger(void) const {
+
+            DangerCalculator dc(board.getSize(), board);
+
+            accept(dc);
+
+            return dc.getDanger();
+
+        }
+
+};
+
+#endif
+~~!!!==#==!!!~~
+//Coord.h//
+#ifndef _COORD_H
+#define _COORD_H
+
+#include <string>
+
+class Coord {
+
+    public:
+
+        // holds x (first) and y (second), which are already normalized (e.g. 0-based)
+        typedef std::pair<int, int> Pair;
+
+        Coord(const std::string coord = "A1")
+            : coord(
+                coord[0]-'A',
+                coord.size() > 2 ? // below we always subtract 1 from the row, as "A1" is not normalized
+                                (coord[1]-'0')*10 + coord[2]-'0' - 1: 
+                                coord[1] - '0' - 1 
+                ) {}
+
+        Pair toIndex() const { return coord; }
+
+        size_t toLinearIndex(size_t boardSize) const {
+            // x (first) and y (second) are already normalized
+            return coord.first + (coord.second)*boardSize;
+        }
+
+        // return the Coord, which differs that the current point with (dX, dY).
+        // for example, to get the upper-right diagonal, dX = 1, dY = -1.
+        // if boardSize is specified, the function will also check for going out of bounds
+        Coord getDiff(int dX, int dY, int boardSize = 0) const { 
+            Pair ret = coord;
+            
+            ret.first += dX;
+            ret.second += dY;
+
+            if (boardSize > 0) {
+                if (ret.first >= boardSize)
+                    ret.first = -1;
+                if (ret.second >= boardSize)
+                    ret.second = -1;
+            }
+
+            return Coord(ret);
+        }
+
+        bool valid(void) const {
+            // we assume that any coord with values >=0 is valid.
+            return coord.first >= 0 && coord.second >= 0;
+        }
+
+    private:
+        Coord(Pair coord) : coord(coord) {}
+        Pair coord;
+};
+
+#endif
+~~!!!==#==!!!~~
+//Diagonalee.h//
+#ifndef DIAGONALEE_H
+#define DIAGONALEE_H
+
+#include "Figurine.h"
+
+class Diagonalee : public Figurine {
+
+    public:
+
+        Diagonalee(const Coord & coord) : Figurine(coord) {}
+
+        virtual std::vector<Coord> endangersFields(const Board & b) const override {
+            std::vector<Coord> res;
+            size_t size = b.getSize();
+            const Coord & c = getCoord();
+
+            // attack all from the Diagonalee till the top-left end
+            Coord next = c.getDiff(-1, -1, size);
+            while(next.valid()) {
+                res.push_back(next);
+                if (b[next] != nullptr)
+                    break; // we reached another figurine - cannot endanger after it
+                next = next.getDiff(-1, -1, size);
+            }
+
+            // attack all from the Fireside till the bottom-right end of the board (size)
+            next = c.getDiff(+1, +1, size);
+            while(next.valid()) {
+                res.push_back(next);
+                if (b[next] != nullptr)
+                    break; // we reached another figurine - cannot endanger after it
+                next = next.getDiff(+1, +1, size);
+            }
+
+            // attack all from the Fireside till the top-right end of the board (size)
+            next = c.getDiff(+1, -1, size);
+            while(next.valid()) {
+                res.push_back(next);
+                if (b[next] != nullptr)
+                    break; // we reached another figurine - cannot endanger after it
+                next = next.getDiff(+1, -1, size);
+            }
+
+            // attack all from the Fireside till the top-right end of the board (size)
+            next = c.getDiff(-1, +1, size);
+            while(next.valid()) {
+                res.push_back(next);
+                if (b[next] != nullptr)
+                    break; // we reached another figurine - cannot endanger after it
+                next = next.getDiff(-1, +1, size);
+            }
+
+            return res;
+        }
+
+        virtual char getNonEndangeredTag(void) const override { return 'D'; }
+        virtual char getEndangeredTag(void) const override { return 'd'; }
+
+};
+
+#endif
+~~!!!==#==!!!~~
+//DangerCalculator.h//
+#ifndef __DANGER_CALCULATOR_H
+#define __DANGER_CALCULATOR_H
+
+#include <vector>
+
+#include "Figurine.h"
+#include "Board.h"
+#include "FigurineCalculator.h"
+
+class DangerCalculator : public FigurineCalculator {
+
+    CharBoard cb;
+    size_t size;
+
+    public:
+
+        DangerCalculator(size_t size, const Board & board) : cb(board), size(board.getSize()) {};
+
+        virtual void calculate(const Figurine *f) override {
+            std::vector<Coord> endangered = f->endangersFields(cb.getBoard());
+
+            for(Coord & c : endangered) 
+                if (c.valid()) {
+                    char mark = '*';
+                    const Figurine * fa = (cb.getBoard())[c];
+                    if (fa != nullptr)
+                        mark = fa->getEndangeredTag();
+                    cb.mark(c, mark);
+                }
+
+        }
+
+        std::pair<size_t, std::string> getDanger(void) const { 
+            size_t dangerSize = 0;
+
+            const std::vector<char> & contents = cb.getContents();
+            for(char c : contents)
+                if (c == '*' || (c >='a' && c <='z'))
+                    dangerSize++;
+
+            return std::pair<size_t, std::string>(dangerSize, (std::string)cb);
+        }
+
+};
+
+#endif
+~~!!!==#==!!!~~
+//Board.h//
+#ifndef __BOARD_H
+#define __BOARD_H
+
+#include "Coord.h"
+#include "Figurine.h"
+
+#include <vector>
+#include <sstream>
+#include <iomanip>
+
+class Board {
+
+    size_t size;
+    std::vector<Figurine *> board;
+
+    public:
+
+        Board(size_t size) : size(size), board(size*size, nullptr) { }
+
+        Figurine * & operator[](const Coord & index) {
+            return board[index.toLinearIndex(size)];
+        }
+
+        const Figurine * operator[](const Coord & index) const {
+            return board[index.toLinearIndex(size)];
+        }
+
+        const std::vector<Figurine *> & getFigurines() const { return board; }
+
+        size_t getSize(void) const { return size; }
+};
+
+class CharBoard { 
+
+    protected:
+
+        const Board & board;
+        size_t size;
+        std::vector<char> contents;
+
+    public:
+
+        CharBoard(const Board & board, char initChar = '.') : board(board), size(board.getSize()), contents(size*size, initChar){
+            const std::vector<Figurine *> & figs = board.getFigurines();
+            for(auto f : figs) 
+                if (f != nullptr) {
+                    mark(f->getCoord(), f->getNonEndangeredTag());
+                }
+        } 
+
+        void mark(const Coord & coord, char c) {
+            contents[coord.toLinearIndex(size)] = c;
+        }
+
+        void mark(const std::vector<Coord> & coords, char c) {
+            for(auto coord : coords)
+                mark(coord, c);
+        }
+
+        const Board & getBoard(void) const { return board; }
+        const std::vector<char> & getContents() const { return contents; }
+
+        operator std::string() const {
+            std::ostringstream ostr;
+            for(int row = size-1; row >=0; row--) {
+                ostr<< std::setw(2) << std::setfill(' ') << row+1 << "|";
+                for(size_t col = 0; col < size; col++) {
+                    ostr << ' ' << contents[row*size+col];
+                }
+                ostr << std::endl;
+            }
+            // now print the final line
+            ostr << "  " << std::string(2+size*2, '-') << std::endl << "   ";
+            for(int col = 0; col < size; col++)
+                ostr << ' ' << char('A' + col);
+            ostr << std::endl;
+            return ostr.str();
+        }
+
+};
+
+#endif
+~~!!!==#==!!!~~
+//main.cpp//
+
+#include "Soldier.h"
+#include "Diagonalee.h"
+#include "Fireside.h"
+#include "Master.h"
+#include "Engine.h"
+#include "DangerCalculator.h"
+
+#include <iostream>
+
+//static
+Figurine * Figurine::factory(const std::string & type, const Coord & coord) {
+    switch(type[0]) {
+        case 'S' : return new Soldier(coord);
+        case 'D' : return new Diagonalee(coord);
+        case 'F' : return new Fireside(coord);
+        case 'M' : return new Master(coord);
+    }
+
+    return nullptr;
+}
+
+int main(void) {
+
+    size_t size;
+    std::cin >> size; std::cin.ignore();
+
+    Engine e(size);
+
+    std::string cmd;
+    std::string lastDanger;
+    while(getline(std::cin, cmd) && cmd != ".") {
+
+        e.read(cmd);
+
+        std::pair<size_t, std::string> danger = e.calculateDanger();
+        std::cout << "Danger: " << danger.first << std::endl;
+        lastDanger = danger.second;
+#ifdef ___DEBUG___
+        std::cout << lastDanger;
+#endif
+    }
+
+    std::cout << lastDanger;
+
+    return 0;
+}
+
+~~!!!==#==!!!~~

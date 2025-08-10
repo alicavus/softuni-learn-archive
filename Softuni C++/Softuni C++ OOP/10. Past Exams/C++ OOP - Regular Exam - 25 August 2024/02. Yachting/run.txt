@@ -1,0 +1,13 @@
+Yacht SeaBreeze successfully docked.
+Yacht OceanQueen successfully docked.
+Error: Yacht SeaBreeze already on dock!
+Error: Yacht MorningStar is not on dock!
+Yacht OceanQueen successfully undocked with passengers [empty] and supplies [empty].
+Error: Yacht MorningStar is not on dock!
+Supply Booze added to yacht SeaBreeze. New quantity: 30.
+Supply Booze added to yacht SeaBreeze. New quantity: 85.
+Passenger John added to crew. New crew: John.
+Passenger Alice added to crew. New crew: Alice, John.
+Error: passenger John already exists in SeaBreeze crew!
+Supply Water added to yacht SeaBreeze. New quantity: 20.
+Yacht SeaBreeze remains on dock with passengers [Alice, John] and supplies [Booze:85, Water:20].

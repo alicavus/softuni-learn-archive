@@ -1,0 +1,3 @@
+from project.artifacts.base_artifact import BaseArtifact
+from project.artifacts.contemporary_artifact import ContemporaryArtifact
+from project.artifacts.renaissance_artifact import RenaissanceArtifact

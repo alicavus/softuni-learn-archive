@@ -1,0 +1,1 @@
+print(f"The sum equals: {sum([ord(input()[0]) for _ in range(int(input()))])}")

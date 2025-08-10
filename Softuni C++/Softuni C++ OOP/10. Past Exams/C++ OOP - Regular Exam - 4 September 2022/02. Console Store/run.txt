@@ -1,0 +1,14 @@
+Adding: PS with generation 1, price: 50, quality: 200
+Adding: Xbox with price: 150, quality: 250
+Adding: Xbox with price: 200, quality: 100
+Adding: Xbox with price: 100, quality: 150
+Sorting all Xbox by quality
+Printing all Xbox data
+Xbox with price: 150, quality: 250
+Xbox with price: 100, quality: 150
+Xbox with price: 200, quality: 100
+Sorting all Xbox by price
+Printing all Xbox data
+Xbox with price: 200, quality: 100
+Xbox with price: 150, quality: 250
+Xbox with price: 100, quality: 150

@@ -1,0 +1,7 @@
+Pizza is collected. 10 minutes for delivery.
+The delivery is late. Order is canceled.
+*----A
+* ***-
+*.***-
+*....R
+******

@@ -1,0 +1,12 @@
+.py
+- - - 01_even_lines.py
+- - - 02_line_numbers.py
+- - - 03_file_manipulator.py
+- - - 04_directory_traversal.py
+.txt
+- - - 01_even_lines.txt
+- - - 02_line_numbers_input.txt
+- - - 02_line_numbers_output.txt
+- - - report.txt
+.zip
+- - - homework.zip

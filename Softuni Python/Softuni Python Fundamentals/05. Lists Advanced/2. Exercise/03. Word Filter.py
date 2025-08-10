@@ -1,0 +1,1 @@
+print("\n".join([x for x in input().split() if not len(x) % 2]))

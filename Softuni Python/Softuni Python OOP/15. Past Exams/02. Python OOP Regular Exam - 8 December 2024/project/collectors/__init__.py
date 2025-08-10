@@ -1,0 +1,3 @@
+from project.collectors.base_collector import BaseCollector
+from project.collectors.museum import Museum
+from project.collectors.private_collector import PrivateCollector

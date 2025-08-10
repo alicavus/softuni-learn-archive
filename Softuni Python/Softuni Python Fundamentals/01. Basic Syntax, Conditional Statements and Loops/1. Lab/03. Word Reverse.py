@@ -1,0 +1,1 @@
+print("".join(reversed([c for c in input()])))

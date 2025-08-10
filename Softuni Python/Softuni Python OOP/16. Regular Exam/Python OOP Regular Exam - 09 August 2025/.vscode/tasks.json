@@ -1,0 +1,29 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "type": "shell",
+            "label": "Create project zip file",
+            "command": "${workspaceFolder}/.vscode/archive.sh",
+            "args": [],
+            "options": {
+                "cwd": "${fileDirname}"
+            },
+            "group": "none",
+            "detail": "Create project zip file..."
+        },
+        {
+            "type": "shell",
+            "label": "Clean __pycache__",
+            "command": "${workspaceFolder}/.vscode/pycache.sh",
+            "args": [],
+            "options": {
+                "cwd": "${workspaceFolder}/"
+            },
+            "group": "none",
+            "detail": "Deletes all python binary bytecode cache"
+        }
+    ]
+}

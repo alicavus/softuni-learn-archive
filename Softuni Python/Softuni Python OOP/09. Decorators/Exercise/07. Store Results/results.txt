@@ -1,0 +1,10 @@
+Function 'add(2, 2)' was called. Result: 4
+Function 'mult(6, 4)' was called. Result: 24
+Function 'add(2, 2)' was called. Result: 4
+Function 'mult(6, 4)' was called. Result: 24
+Function 'add(2, 2)' was called. Result: 4
+Function 'mult(6, 4)' was called. Result: 24
+Function 'add(2, 2)' was called. Result: 4
+Function 'mult(6, 4)' was called. Result: 24
+Function 'add(2, 2)' was called. Result: 4
+Function 'mult(6, 4)' was called. Result: 24
